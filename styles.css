@@ -1,0 +1,56 @@
+#optionMenu{
+	padding: 10px;
+}
+
+#boardSize{
+	
+}
+
+#movesOption{
+	display: flex; 
+    justify-content: center;
+	white-space: pre-wrap;
+}
+
+img {
+  pointer-events: none
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -o-user-select: none;
+  user-select: none;
+}
+
+.grid-wrapper{
+	display: grid;
+	grid-template-columns: repeat(4,300px);
+	justify-content: center;
+	grid-template-rows: repeat(3, 200px);
+	
+}
+
+.face, .reverse {
+  transition: transform 1s;
+  backface-visibility:hidden;
+}
+
+.face{
+  transform: rotateY(180deg);
+}
+
+
+.card img:nth-child(2){
+	position:relative;
+	bottom: 200px;
+}
+
+.faceUp{
+	transform: rotateY(360deg);
+}
+
+.reverseDown{
+	transform: rotateY(180deg);
+}
+
+
+

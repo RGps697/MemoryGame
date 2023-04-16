@@ -1,0 +1,166 @@
+<html>
+<head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+<link rel="stylesheet" href="styles.css">
+
+
+<script>
+var isFirstCard;
+var revealedCard;
+var activeCardsCount;
+var moveCount;
+
+$("document").ready(function() {
+	startNewRun();
+	revealedCard = new Array(2);
+	doSmall();
+});
+
+function startNewRun(){
+	activeCardsCount = 0;
+	moveCount = 0;
+	isFirstCard = true;
+	$("#movesOutput").text(moveCount);
+}
+
+//mała ilość obrazków
+function doSmall(){
+	startNewRun();
+	var rows = 3;
+	var columns = 4;
+	var uniquePictures = rows*columns/2; 
+	$(".grid-wrapper").css({"grid-template-columns" : "repeat(4, 300px)", "grid-template-rows" : "repeat(3, 200px)"});
+	fillCards(rows, columns, uniquePictures);
+}
+
+//średnia ilość obrazków
+function doMedium(){
+	startNewRun();
+	var rows = 4;
+	var columns = 5;
+	var uniquePictures = rows*columns/2; 
+	$(".grid-wrapper").css({"grid-template-columns" : "repeat(5, 300px)", "grid-template-rows" : "repeat(4, 200px)"});
+	fillCards(rows, columns, uniquePictures);
+}
+
+//duża ilość obrazków
+	function doBig(){
+	startNewRun();
+	var rows = 5;
+	var columns = 6;
+	var uniquePictures = rows*columns/2; 
+	$(".grid-wrapper").css({"grid-template-columns" : "repeat(6, 300px)", "grid-template-rows" : "repeat(5, 200px)"});
+	fillCards(rows, columns, uniquePictures);
+}
+
+//funkcja do wypełniania strony kartami w zależności od rozmiaru
+function fillCards(rows, columns, uniquePictures){
+	$(".grid-wrapper").empty();
+	for(var i = 0; i < columns; i++){
+		for(var j = 0; j < rows; j++){
+			$(".grid-wrapper").append('<div draggable="false" class="card"></div>');
+		}
+	}
+	$(".card").append('<img draggable="false" class="reverse" src="obrazy/cardback.jpg"></img>');
+	$(".card").append('<img draggable="false" class="face"></img> ');
+	$(".card").on('click',setActive);
+
+
+//losowanie numerów obrazków
+	var chosenCards = new Array(uniquePictures);
+	var newNumber = 0;
+	var isUnique;
+	for(var i = 0; i < chosenCards.length; i++){
+		isUnique = true;
+		newNumber = Math.floor(Math.random()*21);
+		//sprawdzenie czy taka liczba już jest
+		for(var j = 0; j < i; j++){
+			if(newNumber==chosenCards[j][0]){
+				isUnique = false;
+			}
+		}
+		//jeśli jest taka liczba, ponów wylosowanie, jeśli nie ma, dodaj taką do tablicy
+		if(isUnique==false){
+			i--;
+		}
+		else{
+			chosenCards[i] = new Array(2);
+			chosenCards[i][0] = newNumber;
+			chosenCards[i][1] = 2;
+		}
+	}
+
+	var allCards = $(".grid-wrapper").children();
+
+	allCards.each(function (){
+		var findNew = true;
+		while(findNew){	
+			arrayIndex = Math.floor(Math.random()*uniquePictures);
+			if(chosenCards[arrayIndex][1]!=0){
+			$(this).children(".face").attr("src","obrazy/obraz"+chosenCards[arrayIndex][0]+".jpg");
+			chosenCards[arrayIndex][1]--;
+			findNew = false;
+			}
+		}
+	});
+}
+
+function setActive(){
+	var cardReverse = $(this).find(">:first-child");
+	var cardFace = $(this).find(">:last-child");
+	if(activeCardsCount<2 && !cardFace.hasClass("faceUp")){
+		activeCardsCount++;
+		cardReverse.addClass("reverseDown"); // karta zawsze będzie miała animacje obrotu
+		cardFace.addClass("faceUp");
+		if(isFirstCard){
+			revealedCard[0] = cardReverse;
+			revealedCard[1] = cardFace;
+			isFirstCard = false;
+		}
+		else{
+			if(revealedCard[1].attr("src") == cardFace.attr("src") ){
+				activeCardsCount = 0;
+			}
+			else{
+				setTimeout(function(){hideCard(cardFace,cardReverse)},1500);
+			}
+			isFirstCard = true;
+			$("#movesOutput").text(++moveCount);
+		}
+	}
+}
+
+function hideCard(cardFace,cardReverse){
+	revealedCard[1].removeClass("faceUp");
+	revealedCard[0].removeClass("reverseDown");
+	cardFace.removeClass("faceUp");
+	cardReverse.removeClass("reverseDown");
+	activeCardsCount = 0;
+}
+
+</script>
+
+</head>
+
+
+<body>
+
+<div id="optionMenu">
+<span id="boardSizeOption">
+Rozmiar planszy:
+<button onclick="doSmall()">Mała</button>
+<button onclick="doMedium()">Średnia</button>
+<button onclick="doBig()">Duża</button>
+</span>
+<span id="movesOption">Wykonane ruchy: <output id="movesOutput"></output></span>
+</div>
+
+<div class="grid-wrapper">
+
+</div>
+
+</body>
+
+</html>
